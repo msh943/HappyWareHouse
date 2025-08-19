@@ -1,0 +1,6 @@
+@HappyWarehouse.Api_HostAddress = http://localhost:5001
+
+GET {{HappyWarehouse.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
