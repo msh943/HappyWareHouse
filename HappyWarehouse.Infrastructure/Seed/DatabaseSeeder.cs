@@ -35,7 +35,7 @@ namespace HappyWarehouse.Infrastructure.Seed
                 {
                     Email = "admin@happywarehouse.com",
                     FullName = "System Administrator",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("P@ssw0rd"),
+                    Password = BCrypt.Net.BCrypt.HashPassword("P@ssw0rd"),
                     RoleId = adminRole.Id,
                     IsActive = true
                 });

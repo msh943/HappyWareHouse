@@ -22,9 +22,12 @@ namespace HappyWarehouse.Infrastructure.Repositories
 
         public async Task<T?> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
-            IQueryable<T> q = _set.AsQueryable();
-            foreach (var inc in includes) q = q.Include(inc);
-            return await q.FirstOrDefaultAsync(x => x.Id == id);
+            if (id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id), "ID must be greater than zero.");
+
+            IQueryable<T> query = _set.AsQueryable();
+            foreach (var inc in includes) query = query.Include(inc);
+            return await query.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,
@@ -32,6 +35,9 @@ namespace HappyWarehouse.Infrastructure.Repositories
                                                       int? page = null, int? pageSize = null,
                                                       params Expression<Func<T, object>>[] includes)
         {
+            if (page <= 0) throw new ArgumentOutOfRangeException(nameof(page));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
             IQueryable<T> query = _set.AsQueryable();
             if (predicate != null) query = query.Where(predicate);
             foreach (var inc in includes) query = query.Include(inc);
@@ -52,6 +58,9 @@ namespace HappyWarehouse.Infrastructure.Repositories
 
         public async Task<T> AddAsync(T entity)
         {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
             _set.Add(entity);
             await _db.SaveChangesAsync();
             return entity;
@@ -59,13 +68,19 @@ namespace HappyWarehouse.Infrastructure.Repositories
 
         public async Task UpdateAsync(T entity)
         {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
             _set.Update(entity);
             await _db.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var entity = await _set.FindAsync(id);
+            if (id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id), "ID must be greater than zero.");
+
+            var entity = await _set.FirstOrDefaultAsync(x=> x.Id == id);
             if (entity is null) return;
             _set.Remove(entity);
             await _db.SaveChangesAsync();

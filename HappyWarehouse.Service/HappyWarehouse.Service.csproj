@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HappyWarehouse.Domain\HappyWarehouse.Domain.csproj" />
+    <ProjectReference Include="..\HappyWarehouse.Infrastructure\HappyWarehouse.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
