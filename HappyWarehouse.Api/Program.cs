@@ -1,8 +1,10 @@
-﻿using HappyWarehouse.Infrastructure.Auth;
+﻿using HappyWarehouse.Api;
+using HappyWarehouse.Infrastructure.Auth;
 using HappyWarehouse.Infrastructure.Data;
 using HappyWarehouse.Infrastructure.Repositories;
 using HappyWarehouse.Infrastructure.Seed;
 using HappyWarehouse.Service.IService;
+using HappyWarehouse.Service.Mapping;
 using HappyWarehouse.Service.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -10,12 +12,17 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
+using AutoMapper;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+}); ;
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(s =>
@@ -92,6 +99,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingConfig>());
 builder.Services.AddAuthorization();
 var app = builder.Build();
 

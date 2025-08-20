@@ -23,7 +23,7 @@ namespace HappyWarehouse.Service.Service
         public async Task<(IEnumerable<WarehouseItem> items, int total)> GetAllAsync(int warehouseId, int page, int pageSize)
         {
             var total = await _items.CountAsync(x => x.WarehouseId == warehouseId);
-            var items = await _items.GetAllAsync(x => x.WarehouseId == warehouseId, page: page, pageSize: pageSize, includes: x => x.Warehouse);
+            var items = await _items.GetAllAsync(x => x.WarehouseId == warehouseId, page: page, pageSize: pageSize, asNoTracking: true, includes: x => x.Warehouse);
             return (items, total);
         }
 

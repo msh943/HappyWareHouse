@@ -14,6 +14,7 @@ namespace HappyWarehouse.Infrastructure.Repositories
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,
                                         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
                                         int? page = null, int? pageSize = null,
+                                        bool asNoTracking = true,
                                         params Expression<Func<T, object>>[] includes);
         Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
         Task<T> AddAsync(T entity);

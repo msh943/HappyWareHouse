@@ -1,4 +1,6 @@
-﻿using HappyWarehouse.Domain.Entities;
+﻿using AutoMapper;
+using HappyWarehouse.Domain.Dto;
+using HappyWarehouse.Domain.Entities;
 using HappyWarehouse.Service.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,15 +13,26 @@ namespace HappyWarehouse.Api.Controllers
     public class DashboardController : BaseApiController
     {
         private readonly IDashboardService _svc;
-        public DashboardController(IDashboardService svc) { _svc = svc; }
+        private readonly IMapper _mapper;
+        public DashboardController(IDashboardService svc, IMapper mapper) { _svc = svc; _mapper = mapper; }
 
         [HttpGet]
         public Task<IEnumerable<WarehouseStatusDto>> GetStatus() => _svc.GetWarehouseStatusAsync();
 
         [HttpGet]
-        public Task<IEnumerable<WarehouseItem>> HighItems() => _svc.GetTopHighItemsAsync(10);
+        public async Task<ActionResult<IEnumerable<WarehouseItemDto>>> HighItems([FromQuery] int top = 10)
+        {
+            var entities = await _svc.GetTopHighItemsAsync(top);
+            var dto = _mapper.Map<IEnumerable<WarehouseItemDto>>(entities);
+            return Ok(dto);
+        }
 
         [HttpGet]
-        public Task<IEnumerable<WarehouseItem>> LowItems() => _svc.GetTopLowItemsAsync(10);
+        public async Task<ActionResult<IEnumerable<WarehouseItemDto>>> LowItems([FromQuery] int top = 10)
+        {
+            var entities = await _svc.GetTopLowItemsAsync(top);
+            var dto = _mapper.Map<IEnumerable<WarehouseItemDto>>(entities);
+            return Ok(dto);
+        }
     }
 }

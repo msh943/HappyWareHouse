@@ -1,4 +1,6 @@
-﻿using HappyWarehouse.Domain.Entities;
+﻿using AutoMapper;
+using HappyWarehouse.Domain.Dto;
+using HappyWarehouse.Domain.Entities;
 using HappyWarehouse.Service.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,8 +13,13 @@ namespace HappyWarehouse.Api.Controllers
     public class UsersController : BaseApiController
     {
         private readonly IUserService _svc;
+        private readonly IMapper _mapper;
 
-        public UsersController(IUserService svc) => _svc = svc;
+        public UsersController(IUserService svc, IMapper mapper)
+        {
+            _svc = svc;
+            _mapper = mapper;
+        }
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -21,7 +28,7 @@ namespace HappyWarehouse.Api.Controllers
             var (users, total) = await _svc.GetAllAsync(page, pageSize);
             return Ok(new
             {
-                items = users.Select(u => new {
+                data = users.Select(u => new {
                     u.Id,
                     u.Email,
                     u.FullName,
@@ -34,24 +41,35 @@ namespace HappyWarehouse.Api.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
-        public Task<User?> Get(int id) => _svc.GetByIdAsync(id);
+        public async Task<ActionResult<UserDto>> Get(int id)
+        {
+            var user = await _svc.GetByIdAsync(id);
+            if (user is null) return NotFound();
+            return Ok(_mapper.Map<UserDto>(user));
+        }
 
-        public record CreateUserRequest(string Email, string FullName, int RoleId, bool Active, string Password);
+       
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([FromBody] CreateUserRequest req)
+        public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
         {
-            var user = new User { Email = req.Email, FullName = req.FullName, RoleId = req.RoleId, IsActive = req.Active };
-            var created = await _svc.CreateAsync(user, req.Password);
-            return CreatedAtAction(nameof(Get), new { id = created.Id }, new { created.Id, created.Email, created.FullName, created.IsActive, RoleId = created.RoleId });
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+            var entity = _mapper.Map<User>(dto);
+            var created = await _svc.CreateAsync(entity, dto.Password);
+
+            return CreatedAtAction(nameof(Get), new { id = created.Id }, _mapper.Map<UserDto>(created));
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update([FromBody] User user)
+        public async Task<IActionResult> Update(int id,[FromBody] UpdateUserDto dto)
         {
-            await _svc.UpdateAsync(user);
+            var entity = await _svc.GetByIdAsync(id);
+            if (entity is null) return NotFound();
+
+            _mapper.Map(dto, entity);
+            await _svc.UpdateAsync(entity);
             return NoContent();
         }
 

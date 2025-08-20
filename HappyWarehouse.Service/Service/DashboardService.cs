@@ -31,12 +31,12 @@ namespace HappyWarehouse.Service.Service
 
         public async Task<IEnumerable<WarehouseItem>> GetTopHighItemsAsync(int top = 10)
         {
-            return await _itemRepo.Query().OrderByDescending(x => x.Qty).Take(top).AsNoTracking().ToListAsync();
+            return await _itemRepo.Query().Include(x => x.Warehouse).OrderByDescending(x => x.Qty).Take(top).AsNoTracking().ToListAsync();
         }
 
         public async Task<IEnumerable<WarehouseItem>> GetTopLowItemsAsync(int top = 10)
         {
-            return await _itemRepo.Query().OrderBy(x => x.Qty).Take(top).AsNoTracking().ToListAsync();
+            return await _itemRepo.Query().Include(x=> x.Warehouse).OrderBy(x => x.Qty).Take(top).AsNoTracking().ToListAsync();
         }
     }
 }

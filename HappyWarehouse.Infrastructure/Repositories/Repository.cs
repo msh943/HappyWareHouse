@@ -33,12 +33,15 @@ namespace HappyWarehouse.Infrastructure.Repositories
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null,
                                                       Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
                                                       int? page = null, int? pageSize = null,
+                                                      bool asNoTracking = true,
                                                       params Expression<Func<T, object>>[] includes)
         {
             if (page <= 0) throw new ArgumentOutOfRangeException(nameof(page));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
             IQueryable<T> query = _set.AsQueryable();
+            if (asNoTracking) query = query.AsNoTracking();
+
             if (predicate != null) query = query.Where(predicate);
             foreach (var inc in includes) query = query.Include(inc);
             if (orderBy != null) query = orderBy(query);
