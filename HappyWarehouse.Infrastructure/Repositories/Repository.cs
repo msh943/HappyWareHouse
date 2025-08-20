@@ -70,7 +70,7 @@ namespace HappyWarehouse.Infrastructure.Repositories
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
-
+            entity.UpdatedAt = DateTime.Now;
             _set.Update(entity);
             await _db.SaveChangesAsync();
         }

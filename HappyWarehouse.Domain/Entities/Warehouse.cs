@@ -15,9 +15,8 @@ namespace HappyWarehouse.Domain.Entities
         public string Address { get; set; } = string.Empty;
         [Required]
         public string City { get; set; } = string.Empty;
-
-        [Range(1, int.MaxValue)]
         public int CountryId { get; set; }
+        [Required]
         public Country Country { get; set; } = null!;
 
         public ICollection<WarehouseItem> Items { get; set; } = new List<WarehouseItem>();
