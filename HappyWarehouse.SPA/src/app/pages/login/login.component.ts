@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { applyServerErrors } from '../../core/server-validate';
 
 @Component({
   selector: 'app-login',
@@ -14,14 +15,16 @@ import { CommonModule } from '@angular/common';
 export class LoginComponent {
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) { }
   form = this.fb.group({ email: ['', [Validators.required, Validators.email]], password: ['', [Validators.required]] });
-  submitting = false; error = '';
+  submitting = false;
   submit() {
-    debugger;
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.submitting = true;
     this.auth.login(this.form.value as any).subscribe({
       next: _ => this.router.navigateByUrl('/'),
-      error: err => { this.error = err?.error?.message ?? 'Login failed'; this.submitting = false; }
-    });
+      error: err => applyServerErrors(this.form, err)
+    }).add(() => this.submitting = false);
   }
 }

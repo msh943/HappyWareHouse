@@ -1,0 +1,60 @@
+.wel-wrap {
+  min-height: calc(100vh - 56px);
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(1200px 600px at 90% -10%, #eef3ff 0, transparent 60%), radial-gradient(1000px 500px at -10% 110%, #f5fff7 0, transparent 60%), #f8f9fb;
+}
+
+
+.wel-card {
+  border: none;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+  .wel-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .6rem 1.2rem rgba(0,0,0,.12);
+    text-decoration: none;
+  }
+
+
+.blob {
+  position: absolute;
+  width: 38vmax;
+  height: 38vmax;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: .25;
+  animation: float 16s ease-in-out infinite;
+}
+
+  .blob.b1 {
+    background: #7da4ff;
+    top: -12vmax;
+    right: -12vmax;
+    animation-delay: 0s;
+  }
+
+  .blob.b2 {
+    background: #59d6a1;
+    bottom: -14vmax;
+    left: -12vmax;
+    animation-delay: 2s;
+  }
+
+  .blob.b3 {
+    background: #ffd166;
+    top: 20%;
+    left: 55%;
+    animation-delay: 4s;
+  }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-2%) translateX(2%) scale(1.05);
+  }
+}

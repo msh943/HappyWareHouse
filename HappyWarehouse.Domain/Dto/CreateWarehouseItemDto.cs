@@ -14,10 +14,14 @@ namespace HappyWarehouse.Domain.Dto
 
         public string? SkuCode { get; set; }
 
-        [Range(1, int.MaxValue)]
+        [Range(1, int.MaxValue, ErrorMessage = "Qty cannot be negative or zero.")]
         public int Qty { get; set; }
         [Required]
+        [Range(0, double.MaxValue, ErrorMessage = "Cost price cannot be negative or zero.")]
+
         public decimal CostPrice { get; set; }
+        [Range(0, double.MaxValue, ErrorMessage = "MSRP price cannot be negative.")]
+
         public decimal? MsrpPrice { get; set; }
 
         [Required]

@@ -1,17 +1,47 @@
 <div class="card-white">
   <h3>{{id ? 'Edit' : 'Create'}} Warehouse</h3>
-  <form [formGroup]="form" (ngSubmit)="save()">
+  <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div *ngIf="form.errors?.['serverAll']" class="alert alert-danger">{{ form.errors?.['serverAll'] }}</div>
     <div class="row g-3">
-      <div class="col-md-6"><label class="form-label">Name</label><input class="form-control" formControlName="name"></div>
-      <div class="col-md-6"><label class="form-label">City</label><input class="form-control" formControlName="city"></div>
-      <div class="col-12"><label class="form-label">Address</label><input class="form-control" formControlName="address"></div>
+      <div class="col-md-6">
+        <label class="form-label">Name</label>
+        <input class="form-control" formControlName="name"
+               [class.is-invalid]="(form.controls.name.touched && form.controls.name.invalid) || !!form.controls.name.errors?.['server']">
+      </div>
+      <div class="invalid-feedback" *ngIf="form.controls.name.touched && form.controls.name.errors?.['required']">Name is required.</div>
+      <div class="invalid-feedback" *ngIf="form.controls.name.errors?.['server']">{{ form.controls.name.errors?.['server'] }}</div>
+
+      <div class="col-md-6">
+        <label class="form-label">City</label>
+        <input class="form-control" formControlName="city"
+               [class.is-invalid]="(form.controls.city.touched && form.controls.city.invalid) || !!form.controls.city.errors?.['server']">
+        <div class="invalid-feedback" *ngIf="form.controls.city.touched && form.controls.city.errors?.['required']">City is required.</div>
+        <div class="invalid-feedback" *ngIf="form.controls.city.errors?.['server']">{{ form.controls.city.errors?.['server'] }}</div>
+      </div>
+      <div class="col-12"><label class="form-label">Address</label>
+      <input class="form-control" formControlName="address"
+              [class.is-invalid]="(form.controls.address.touched && form.controls.address.invalid) || !!form.controls.address.errors?.['server']">
+      <div class="invalid-feedback" *ngIf="form.controls.address.touched && form.controls.address.errors?.['required']">Address is required.</div>
+      <div class="invalid-feedback" *ngIf="form.controls.address.errors?.['server']">{{ form.controls.address.errors?.['server'] }}</div>
+      </div>
       <div class="col-md-6">
         <label class="form-label">Country</label>
-        <select class="form-select" formControlName="countryId">
+        <select class="form-select" formControlName="countryId"
+                [class.is-invalid]="(form.controls.countryId.touched && form.controls.countryId.invalid) || !!form.controls.countryId.errors?.['server']">
+          <option [ngValue]="0" disabled>-- select country --</option>
           <option *ngFor="let c of countries" [value]="c.id">{{c.name}}</option>
         </select>
+        <div class="invalid-feedback" *ngIf="form.controls.countryId.touched && (form.controls.countryId.errors?.['required'] || form.controls.countryId.errors?.['min'])">
+          Country is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.controls.countryId.errors?.['server']">{{ form.controls.countryId.errors?.['server'] }}</div>
       </div>
-      <div class="col-12"><button class="btn btn-primary">Save</button></div>
+      <div class="col-12">
+        <button class="btn btn-primary" [disabled]="saving">Save</button>
+        <app-back-button  label="Back"
+                         fallbackUrl="/warehouses"
+                         btnClass="btn btn-secondary ms-3"></app-back-button>
+      </div>
     </div>
   </form>
 </div>

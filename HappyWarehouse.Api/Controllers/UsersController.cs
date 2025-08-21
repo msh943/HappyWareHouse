@@ -66,6 +66,7 @@ namespace HappyWarehouse.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id,[FromBody] UpdateUserDto dto)
         {
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
             var entity = await _svc.GetByIdAsync(id);
             if (entity is null) return NotFound();
 
@@ -75,15 +76,13 @@ namespace HappyWarehouse.Api.Controllers
 
 
             _mapper.Map(dto, entity);
-            await _svc.UpdateAsync(entity);
-            return NoContent();
-        }
 
-        [HttpPost("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ChangePassword(int id, [FromBody] string newPassword)
-        {
-            await _svc.ChangePasswordAsync(id, newPassword);
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                await _svc.ChangePasswordAsync(entity.Id, dto.Password);
+            }
+
+            await _svc.UpdateAsync(entity);
             return NoContent();
         }
 

@@ -17,8 +17,10 @@ namespace HappyWarehouse.Domain.Dto
         public string Email { get; set; } = string.Empty;
         [Required]
         public string FullName { get; set; } = string.Empty;
+        [Required]
         public int RoleId { get; set; }
         [Required]
         public bool IsActive { get; set; } = true;
+        public string? Password { get; set; }
     }
 }

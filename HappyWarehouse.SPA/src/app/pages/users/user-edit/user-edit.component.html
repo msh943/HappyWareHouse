@@ -1,24 +1,53 @@
 <div class="card-white">
   <h3>{{id ? 'Edit' : 'Create'}} User</h3>
   <form [formGroup]="form" (ngSubmit)="save()">
+    <div *ngIf="form.errors?.['serverAll']" class="alert alert-danger">
+      {{ form.errors?.['serverAll'] }}
+    </div>
     <div class="row g-3">
       <div class="col-md-6">
         <label class="form-label">Full name</label>
-        <input class="form-control" formControlName="fullName">
+        <input class="form-control" formControlName="fullName"
+               [class.is-invalid]="(form.controls.fullName.touched && form.controls.fullName.invalid) || !!form.controls.fullName.errors?.['server']">
+        <div class="invalid-feedback" *ngIf="form.controls.fullName.touched && form.controls.fullName.errors?.['required']">Full name is required.</div>
+        <div class="invalid-feedback" *ngIf="form.controls.fullName.errors?.['server']">{{ form.controls.fullName.errors?.['server'] }}</div>
       </div>
       <div class="col-md-6">
         <label class="form-label">Email</label>
-        <input class="form-control" type="email" formControlName="email">
+        <input class="form-control" type="email" formControlName="email"
+               [class.is-invalid]="(form.controls.email.touched && form.controls.email.invalid) || !!form.controls.email.errors?.['server']">
+
+        <div class="invalid-feedback" *ngIf="form.controls.email.touched && form.controls.email.errors?.['required']">Email is required.</div>
+        <div class="invalid-feedback" *ngIf="form.controls.email.touched && form.controls.email.errors?.['email']">Enter a valid email.</div>
+        <div class="invalid-feedback" *ngIf="form.controls.email.errors?.['server']">{{ form.controls.email.errors?.['server'] }}</div>
       </div>
       <div class="col-md-6">
         <label class="form-label">Role</label>
-        <select class="form-select" formControlName="roleId">
+        <select class="form-select" formControlName="roleId"
+                [class.is-invalid]="(form.controls.roleId.touched && form.controls.roleId.invalid) || !!form.controls.roleId.errors?.['server']">
+          <option [ngValue]="0" disabled>-- select role --</option>
           <option *ngFor="let r of roles" [value]="r.id">{{r.name}}</option>
         </select>
+        <div class="invalid-feedback" *ngIf="form.controls.roleId.touched && (form.controls.roleId.errors?.['required'] || form.controls.roleId.errors?.['min'])">
+          Role is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.controls.roleId.errors?.['server']">{{ form.controls.roleId.errors?.['server'] }}</div>
       </div>
       <div class="col-md-6">
+        <label class="form-label">{{ id === 0 ? 'Password' : 'New password (optional)' }}</label>
         <label class="form-label">Password (for create/change)</label>
-        <input class="form-control" type="password" formControlName="password">
+        <input class="form-control" type="password" formControlName="password"
+               [class.is-invalid]="(form.controls.password.touched && form.controls.password.invalid) || !!form.controls.password.errors?.['server']">
+
+        <div class="invalid-feedback" *ngIf="id === 0 && form.controls.password.touched && form.controls.password.errors?.['required']">
+          Password is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.controls.password.touched && form.controls.password.errors?.['pattern']">
+          Must be at least 8 characters and include an uppercase letter, a number, and a symbol.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.controls.password.errors?.['server']">
+          {{ form.controls.password.errors?.['server'] }}
+        </div>
       </div>
 
       <div class="col-md-6">
@@ -33,7 +62,10 @@
       </div>
 
       <div class="col-12">
-        <button class="btn btn-primary">Save</button>
+        <button class="btn btn-primary" [disabled]="saving">Save</button>
+        <app-back-button label="Back"
+                         fallbackUrl="/users"
+                         btnClass="btn btn-secondary ms-3"></app-back-button>
       </div>
     </div>
   </form>

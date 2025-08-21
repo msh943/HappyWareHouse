@@ -7,6 +7,7 @@ import { Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { WarehouseItemDto } from '../../../models/warehouse-item.dto';
 import { ItemsService } from '../../../services/items.service';
 import { take } from 'rxjs/operators';
+import { applyServerErrors } from '../../../core/server-validate';
 
 @Component({
   selector: 'app-warehouses-list',
@@ -28,9 +29,9 @@ export class WarehousesListComponent implements OnInit {
   itemForm = this.fb.nonNullable.group({
     itemName: ['', Validators.required],
     skuCode: [''],
-    qty: 0,
-    costPrice: [0, Validators.required],
-    msrpPrice: 0
+    qty: [0, [Validators.required, Validators.min(1)]],
+    costPrice: [0, [Validators.required, Validators.min(0.01)]],
+    msrpPrice: [0, [Validators.min(0)]]
   });
 
   constructor(
@@ -57,7 +58,6 @@ export class WarehousesListComponent implements OnInit {
   }
 
   fetchItems() {
-    debugger;
     if (this.expandedId == null) return;
     this.itemsSvc.listByWarehouse(this.expandedId).subscribe(r => {
       this.items = r.items;
@@ -72,7 +72,6 @@ export class WarehousesListComponent implements OnInit {
   }
 
   Edit(id : number) {
-    debugger;
     this.editingId = id;
     this.itemsSvc.getForEdit(id)
       .pipe(take(1))
@@ -86,14 +85,16 @@ export class WarehousesListComponent implements OnInit {
       ...this.itemForm.getRawValue()
     };
 
-    debugger;
     const save$ = this.editingId
       ? this.itemsSvc.update(this.editingId, payload)
       : this.itemsSvc.createForWarehouse(payload);
 
-    save$.subscribe(_ => {
-      this.fetchItems();
-      (document.getElementById('itemModalClose') as HTMLButtonElement)?.click();
+    save$.subscribe({
+      next: _ => {
+        this.fetchItems();
+        (document.getElementById('itemModalClose') as HTMLButtonElement)?.click();
+      },
+      error: err => applyServerErrors(this.itemForm, err)
     });
   }
 

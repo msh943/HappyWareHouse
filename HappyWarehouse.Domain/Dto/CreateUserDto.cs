@@ -15,8 +15,10 @@ namespace HappyWarehouse.Domain.Dto
         public string Email { get; set; } = string.Empty;
         [Required]
         public string FullName { get; set; } = string.Empty;
-        [Required]
+        [Required, RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$",
+        ErrorMessage = "Password must be ≥ 8 chars, include uppercase, number, and symbol.")]
         public string Password { get; set; } = string.Empty;
+        [Required]
         public int RoleId { get; set; }
         [Required]
         public bool IsActive { get; set; } = true;

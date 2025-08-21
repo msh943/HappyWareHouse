@@ -1,17 +1,35 @@
 <div class="d-flex justify-content-center mt-5">
   <div class="card-white" style="width:420px">
     <h3 class="mb-3">Login</h3>
-    <form [formGroup]="form" (ngSubmit)="submit()">
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div *ngIf="form.errors?.['serverAll']" class="alert alert-danger">
+        {{ form.errors?.['serverAll'] }}
+      </div>
       <div class="mb-3">
         <label class="form-label">Email</label>
-        <input class="form-control" type="email" formControlName="email">
+        <input class="form-control" type="email" formControlName="email"
+               [class.is-invalid]="(form.controls.email.touched && form.controls.email.invalid) || !!form.controls.email.errors?.['server']">
+        <div class="invalid-feedback" *ngIf="form.controls.email.touched && form.controls.email.errors?.['required']">
+          Email is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.controls.email.touched && form.controls.email.errors?.['email']">
+          Please enter a valid email.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.controls.email.errors?.['server']">
+          {{ form.controls.email.errors?.['server'] }}
+        </div>
       </div>
       <div class="mb-3">
         <label class="form-label">Password</label>
-        <input class="form-control" type="password" formControlName="password">
+        <input class="form-control" type="password" formControlName="password" [class.is-invalid]="(form.controls.password.touched && form.controls.password.invalid) || !!form.controls.password.errors?.['server']">
+        <div class="invalid-feedback" *ngIf="form.controls.password.touched && form.controls.password.errors?.['required']">
+          Password is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.controls.password.errors?.['server']">
+          {{ form.controls.password.errors?.['server'] }}
+        </div>
       </div>
       <button class="btn btn-primary w-100" [disabled]="submitting">Login</button>
-      <div class="text-danger mt-2" *ngIf="error">{{error}}</div>
     </form>
   </div>
 </div>

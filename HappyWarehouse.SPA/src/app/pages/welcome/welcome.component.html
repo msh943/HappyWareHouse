@@ -1,0 +1,53 @@
+<div class="wel-wrap">
+
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <div class="container py-5 position-relative" @fadeUp>
+    <div class="text-center mb-4">
+      <h1 class="display-5 fw-semibold">Welcome 👋</h1>
+      <p class="lead text-muted">{{ greeting }} and welcome back to <b>HappyWarehouse</b>.</p>
+    </div>
+
+    <div class="row g-3 justify-content-center" @staggerCards>
+      <div class="col-12 col-md-6 col-lg-4">
+        <a routerLink="/dashboard" class="wel-card card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-1">Dashboard</h5>
+            <p class="card-text text-muted">Quick overview of stock & KPIs.</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <a routerLink="/warehouses" class="wel-card card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-1">Warehouses</h5>
+            <p class="card-text text-muted">Manage locations & their items.</p>
+          </div>
+        </a>
+      </div>
+
+    
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <a routerLink="/users" class="wel-card card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-1">Users</h5>
+            <p class="card-text text-muted">Manage team roles & access.</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <a routerLink="/logs" class="wel-card card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-1">Logs</h5>
+            <p class="card-text text-muted">See latest system activity.</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

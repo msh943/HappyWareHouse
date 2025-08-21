@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyWarehouse.Infrastructu
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "HappyWarehouse.SPA", "HappyWarehouse.SPA\HappyWarehouse.SPA.esproj", "{9E5B000A-5175-A55E-8CE9-42E7D0CE23F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyWarehouse.Tests.Unit", "HappyWarehouse.Tests.Unit\HappyWarehouse.Tests.Unit.csproj", "{45A7EDCB-6F8B-4534-96F8-5F856C59A1B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyWarehouse.Tests.Integration", "HappyWarehouse.Tests.Integration\HappyWarehouse.Tests.Integration.csproj", "{0A8EB6C3-13FF-4E55-B230-CC5C62AF5F64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +45,14 @@ Global
 		{9E5B000A-5175-A55E-8CE9-42E7D0CE23F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E5B000A-5175-A55E-8CE9-42E7D0CE23F2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9E5B000A-5175-A55E-8CE9-42E7D0CE23F2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{45A7EDCB-6F8B-4534-96F8-5F856C59A1B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45A7EDCB-6F8B-4534-96F8-5F856C59A1B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45A7EDCB-6F8B-4534-96F8-5F856C59A1B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45A7EDCB-6F8B-4534-96F8-5F856C59A1B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A8EB6C3-13FF-4E55-B230-CC5C62AF5F64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A8EB6C3-13FF-4E55-B230-CC5C62AF5F64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A8EB6C3-13FF-4E55-B230-CC5C62AF5F64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A8EB6C3-13FF-4E55-B230-CC5C62AF5F64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

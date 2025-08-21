@@ -85,24 +85,45 @@
         <div class="modal-body">
           <div class="mb-2">
             <label class="form-label">Item Name</label>
-            <input class="form-control" formControlName="itemName">
+            <input class="form-control" formControlName="itemName"
+                   [class.is-invalid]="(itemForm.controls.itemName.touched && itemForm.controls.itemName.invalid) || !!itemForm.controls.itemName.errors?.['server']">
           </div>
+          <div class="invalid-feedback" *ngIf="itemForm.controls.itemName.touched && itemForm.controls.itemName.errors?.['required']">Item name is required.</div>
+          <div class="invalid-feedback" *ngIf="itemForm.controls.itemName.errors?.['server']">{{ itemForm.controls.itemName.errors?.['server'] }}</div>
+
           <div class="mb-2">
             <label class="form-label">SKU</label>
-            <input class="form-control" formControlName="skuCode">
+            <input class="form-control" formControlName="skuCode"
+                   [class.is-invalid]="!!itemForm.controls.skuCode.errors?.['server']">
+            <div class="invalid-feedback" *ngIf="itemForm.controls.skuCode.errors?.['server']">{{ itemForm.controls.skuCode.errors?.['server'] }}</div>
           </div>
           <div class="row g-2">
             <div class="col">
               <label class="form-label">Qty</label>
-              <input type="number" class="form-control" formControlName="qty">
+              <input type="number" class="form-control" formControlName="qty" min="1"
+                     [class.is-invalid]="(itemForm.controls.qty.touched && itemForm.controls.qty.invalid) || !!itemForm.controls.qty.errors?.['server']">
+              <div class="invalid-feedback" *ngIf="itemForm.controls.qty.touched && (itemForm.controls.qty.errors?.['required'] || itemForm.controls.qty.errors?.['min'])">
+                Qty must be 1 or more.
+              </div>
+              <div class="invalid-feedback" *ngIf="itemForm.controls.qty.errors?.['server']">{{ itemForm.controls.qty.errors?.['server'] }}</div>
             </div>
             <div class="col">
               <label class="form-label">Cost</label>
-              <input type="number" class="form-control" formControlName="costPrice">
+              <input type="number" class="form-control" formControlName="costPrice" min="0.01" step="0.01"
+                     [class.is-invalid]="(itemForm.controls.costPrice.touched && itemForm.controls.costPrice.invalid) || !!itemForm.controls.costPrice.errors?.['server']">
+              <div class="invalid-feedback" *ngIf="itemForm.controls.costPrice.touched && (itemForm.controls.costPrice.errors?.['required'] || itemForm.controls.costPrice.errors?.['min'])">
+                Cost price must be 0 or more.
+              </div>
+              <div class="invalid-feedback" *ngIf="itemForm.controls.costPrice.errors?.['server']">{{ itemForm.controls.costPrice.errors?.['server'] }}</div>
             </div>
             <div class="col">
               <label class="form-label">MSRP</label>
-              <input type="number" class="form-control" formControlName="msrpPrice">
+              <input type="number" class="form-control" formControlName="msrpPrice"
+                      [class.is-invalid]="(itemForm.controls.msrpPrice.touched && itemForm.controls.msrpPrice.invalid) || !!itemForm.controls.msrpPrice.errors?.['server']">
+              <div class="invalid-feedback" *ngIf="itemForm.controls.msrpPrice.touched && (itemForm.controls.msrpPrice.errors?.['min'])">
+                MSRP must be Postive.
+              </div>
+            <div class="invalid-feedback" *ngIf="itemForm.controls.msrpPrice.errors?.['server']">{{ itemForm.controls.msrpPrice.errors?.['server'] }}</div>
             </div>
           </div>
         </div>

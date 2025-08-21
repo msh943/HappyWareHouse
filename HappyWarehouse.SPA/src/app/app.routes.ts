@@ -2,9 +2,11 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), canActivate: [authGuard] },
+  { path: '', loadComponent: () => import('./pages/welcome/welcome.component').then(m => m.WelcomeComponent), canActivate: [authGuard] },
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
 
+
+  { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), canActivate: [authGuard] },
 
   { path: 'warehouses', loadComponent: () => import('./pages/warehouses/warehouses-list/warehouses-list.component').then(m => m.WarehousesListComponent), canActivate: [authGuard] },
   { path: 'warehouses/new', loadComponent: () => import('./pages/warehouses/warehouse-edit/warehouse-edit.component').then(m => m.WarehouseEditComponent), canActivate: [authGuard] },

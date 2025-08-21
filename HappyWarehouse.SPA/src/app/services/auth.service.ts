@@ -10,7 +10,6 @@ export class AuthService {
 
   constructor(private api: ApiService) { }
   login(req: LoginRequest) {
-    debugger;
     return this.api.http.post<LoginResponse>(`${this.api.base}/Auth/Login`, req)
       .pipe(tap(res => localStorage.setItem('jwt', res.token)));
   }
