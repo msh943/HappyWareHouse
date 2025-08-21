@@ -8,6 +8,7 @@ using HappyWarehouse.Service.IService;
 using HappyWarehouse.Service.Mapping;
 using HappyWarehouse.Service.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -80,7 +81,23 @@ builder.Host.UseSerilog((ctx, lc) =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
+
+    var raw = builder.Configuration.GetConnectionString("Sqlite")
+              ?? "Data Source={ContentRoot}/App_Data/happywarehouse.db";
+    var withRoot = raw.Replace("{ContentRoot}", builder.Environment.ContentRootPath);
+
+
+    var csb = new SqliteConnectionStringBuilder(withRoot);
+    var dbFile = csb.DataSource!;
+
+    if (!Path.IsPathRooted(dbFile))
+        dbFile = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, dbFile));
+
+    var dir = Path.GetDirectoryName(dbFile)!;
+    Directory.CreateDirectory(dir);
+
+    csb.DataSource = dbFile;
+    options.UseSqlite(csb.ToString());
 });
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -132,10 +149,22 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+var enableSwagger = app.Configuration.GetValue<bool>("Swagger:Enabled");
+if (enableSwagger)
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(o =>
+    {
+        o.SwaggerEndpoint("/swagger/v1/swagger.json", "HappyWarehouse API v1");
+        o.RoutePrefix = "swagger";
+        o.DisplayRequestDuration();
+    });
 }
 
 app.UseHttpsRedirection();
