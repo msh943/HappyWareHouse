@@ -1,4 +1,5 @@
-﻿using HappyWarehouse.Api;
+﻿using AutoMapper;
+using HappyWarehouse.Api;
 using HappyWarehouse.Infrastructure.Auth;
 using HappyWarehouse.Infrastructure.Data;
 using HappyWarehouse.Infrastructure.Repositories;
@@ -11,8 +12,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
-using AutoMapper;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,11 +55,29 @@ builder.Services.AddSwaggerGen(s =>
     });
 });
 
+var logsDir = Path.Combine(builder.Environment.ContentRootPath, "Logs");
+Directory.CreateDirectory(logsDir);
+
 builder.Host.UseSerilog((ctx, lc) =>
 {
-    lc.ReadFrom.Configuration(ctx.Configuration)
-      .Enrich.FromLogContext();
+    lc.MinimumLevel.Information()
+      .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+      .Enrich.FromLogContext()
+      .WriteTo.File(
+          path: Path.Combine(logsDir, "app-.log"),
+          rollingInterval: RollingInterval.Day,
+          retainedFileCountLimit: 14,
+          shared: true,
+          outputTemplate:
+              "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {RequestPath} {Message:lj}{NewLine}{Exception}")
+      .WriteTo.File(
+          formatter: new CompactJsonFormatter(),
+          path: Path.Combine(logsDir, "app-.clef"),
+          rollingInterval: RollingInterval.Day,
+          retainedFileCountLimit: 14,
+          shared: true);
 });
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
@@ -69,6 +91,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<IWarehouseItemService, WarehouseItemService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<ILookupsService, LookupsService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddCors(opt =>
@@ -84,9 +107,11 @@ var issuer = jwt["Issuer"] ?? "HappyWarehouse";
 var audience = jwt["Audience"] ?? "HappyWarehouseAudience";
 var key = jwt["Key"] ?? "CHANGEME_SUPER_SECRET_KEY_123456789";
 
+JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -95,11 +120,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = issuer,
             ValidAudience = audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            NameClaimType = JwtRegisteredClaimNames.Sub,
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingConfig>());
+
 builder.Services.AddAuthorization();
 var app = builder.Build();
 
@@ -111,7 +139,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseSerilogRequestLogging();
+app.UseSerilogRequestLogging(o =>
+{
+    o.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0} ms";
+});
 app.UseAuthentication();
 app.UseAuthorization();
 

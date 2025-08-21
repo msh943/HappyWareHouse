@@ -1,0 +1,40 @@
+<div class="card-white">
+  <h3>{{id ? 'Edit' : 'Create'}} User</h3>
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Full name</label>
+        <input class="form-control" formControlName="fullName">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" formControlName="email">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Role</label>
+        <select class="form-select" formControlName="roleId">
+          <option *ngFor="let r of roles" [value]="r.id">{{r.name}}</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Password (for create/change)</label>
+        <input class="form-control" type="password" formControlName="password">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label d-block">Active</label>
+        <div class="form-check form-switch">
+          <input id="isActive" class="form-check-input" type="checkbox"
+                 [formControl]="form.controls.isActive">
+          <label class="form-check-label" for="isActive">
+            {{ form.controls.isActive.value ? 'Active' : 'Inactive' }}
+          </label>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </form>
+</div>

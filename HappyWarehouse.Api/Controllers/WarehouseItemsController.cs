@@ -56,7 +56,7 @@ namespace HappyWarehouse.Api.Controllers
             return CreatedAtAction(nameof(Get), new { id = created.Id }, _mapper.Map<WarehouseItemDto>(created));
         }
 
-        [HttpPost]
+        [HttpPost("{id}")]
         [Authorize(Roles = "Admin,Management")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateWarehouseItemDto dto)
         {

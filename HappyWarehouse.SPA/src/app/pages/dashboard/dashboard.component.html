@@ -1,0 +1,36 @@
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="card-white">
+      <h5>Warehouse Status</h5>
+      <table class="table table-sm">
+        <thead><tr><th>Warehouse</th><th class="text-end">Items</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of status">
+            <td>{{r.warehouseName}}</td>
+            <td class="text-end">{{r.itemCount}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="card-white">
+      <h5>Top High Items</h5>
+      <table class="table table-sm">
+        <thead><tr><th>Item</th><th class="text-end">Qty</th><th>Warehouse</th></tr></thead>
+        <tbody><tr *ngFor="let r of topHigh"><td>{{r.itemName}}</td><td class="text-end">{{r.qty}}</td><td>{{r.warehouseName}}</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card-white">
+      <h5>Top Low Items</h5>
+      <table class="table table-sm">
+        <thead><tr><th>Item</th><th class="text-end">Qty</th><th>Warehouse</th></tr></thead>
+        <tbody><tr *ngFor="let r of topLow"><td>{{r.itemName}}</td><td class="text-end">{{r.qty}}</td><td>{{r.warehouseName}}</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>

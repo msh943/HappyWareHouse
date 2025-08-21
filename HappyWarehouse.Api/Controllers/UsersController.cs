@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HappyWarehouse.Domain.Dto;
 using HappyWarehouse.Domain.Entities;
+using HappyWarehouse.Infrastructure.Auth;
 using HappyWarehouse.Service.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -61,12 +62,17 @@ namespace HappyWarehouse.Api.Controllers
             return CreatedAtAction(nameof(Get), new { id = created.Id }, _mapper.Map<UserDto>(created));
         }
 
-        [HttpPost]
+        [HttpPost("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id,[FromBody] UpdateUserDto dto)
         {
             var entity = await _svc.GetByIdAsync(id);
             if (entity is null) return NotFound();
+
+            var currentUserId = User.GetUserId();
+            if (currentUserId == id && dto.IsActive == false)
+                return BadRequest("You cannot deactivate your own account.");
+
 
             _mapper.Map(dto, entity);
             await _svc.UpdateAsync(entity);

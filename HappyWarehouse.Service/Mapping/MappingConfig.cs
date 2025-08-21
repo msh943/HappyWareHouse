@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using HappyWarehouse.Domain.Dto;
 using HappyWarehouse.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HappyWarehouse.Service.Mapping
 {
@@ -19,24 +14,25 @@ namespace HappyWarehouse.Service.Mapping
 
             CreateMap<CreateUserDto, User>();
 
-            CreateMap<UpdateUserDto, User>();
+            CreateMap<UpdateUserDto, User>().ForMember(d => d.Id, opt => opt.Ignore());
 
             CreateMap<Warehouse, WarehouseDto>()
            .ForMember(d => d.CountryName, m => m.MapFrom(s => s.Country != null ? s.Country.Name : string.Empty))
-           .ForMember(d => d.WarehouseItems,m => m.MapFrom(s => s.Items));
+           .ForMember(d => d.WarehouseItems, m => m.MapFrom(s => s.Items));
 
             CreateMap<WarehouseItem, WarehouseItemDto>();
 
             CreateMap<CreateWarehouseDto, Warehouse>();
 
 
-            CreateMap<UpdateWarehouseDto, Warehouse>();
+            CreateMap<UpdateWarehouseDto, Warehouse>().ForMember(d => d.Id, opt => opt.Ignore());
 
 
             CreateMap<CreateWarehouseItemDto, WarehouseItem>();
 
 
-            CreateMap<UpdateWarehouseItemDto, WarehouseItem>();
+            CreateMap<UpdateWarehouseItemDto, WarehouseItem>().ForMember(d => d.Id, opt => opt.Ignore());
+
         }
     }
 }

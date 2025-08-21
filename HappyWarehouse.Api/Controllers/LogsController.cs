@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Emit;
+using System.Text.Json;
 
 namespace HappyWarehouse.Api.Controllers
 {
@@ -16,37 +18,94 @@ namespace HappyWarehouse.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetLogs([FromQuery] int last = 200)
+        public IActionResult GetLogs([FromQuery] int last = 200, [FromQuery] string? level = null, [FromQuery] string? search = null)
         {
-            var file = Directory.EnumerateFiles(_logsDir, "log-*.txt")
+;
+            if (!Directory.Exists(_logsDir))
+                return Ok(new { items = Array.Empty<object>() });
+
+            var file = Directory.EnumerateFiles(_logsDir, "app-*.clef")
                                 .OrderByDescending(x => x)
                                 .FirstOrDefault();
+            if (file is null)
+                return Ok(new { items = Array.Empty<object>() });
 
-            if (string.IsNullOrEmpty(file))
-                return Ok(new { lines = Array.Empty<string>() });
+            // Share the file with the process that’s writing it
+            using var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var sr = new StreamReader(fs);
 
-            string[] lines = Array.Empty<string>();
+            var lines = new List<string>();
+            while (!sr.EndOfStream) lines.Add(sr.ReadLine()!);
+            var slice = lines.TakeLast(Math.Max(1, last));
 
-            for (int attempt = 0; attempt < 3; attempt++)
+            var items = new List<object>();
+
+            foreach (var l in slice)
             {
                 try
                 {
-                    using var fs = new FileStream(file, FileMode.Open, FileAccess.Read,
-                                                  FileShare.ReadWrite | FileShare.Delete);
-                    using var sr = new StreamReader(fs);
-                    var all = new List<string>();
-                    string? line;
-                    while ((line = sr.ReadLine()) != null) all.Add(line);
-                    lines = all.TakeLast(Math.Max(1, last)).ToArray();
-                    break;
+                    using var doc = JsonDocument.Parse(l);
+                    var r = doc.RootElement;
+
+                    var lvlRaw = r.TryGetProperty("@l", out var L) ? L.GetString() : "Information";
+                    var lvl = CanonLevel(lvlRaw);
+                    if (!string.IsNullOrWhiteSpace(level) && !string.Equals(level, lvl, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var message =
+                        r.TryGetProperty("@mt", out var mt) ? mt.GetString() :
+                        r.TryGetProperty("@m", out var m) ? m.GetString() : "";
+
+                    var obj = new
+                    {
+                        time = r.GetProperty("@t").GetDateTime(),
+                        level = lvl,
+                        message,
+                        exception = r.TryGetProperty("@x", out var ex) ? ex.GetString() : null,
+                        path = r.TryGetProperty("RequestPath", out var p) ? p.GetString() : null,
+                        source = r.TryGetProperty("SourceContext", out var sc) ? sc.GetString() : null,
+                        status = r.TryGetProperty("StatusCode", out var st) ? st.GetInt32() : (int?)null,
+                        elapsed = r.TryGetProperty("Elapsed", out var el) ? el.GetDouble() : (double?)null
+                    };
+
+                    if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        var hay = $"{obj.message} {obj.exception} {obj.path} {obj.source}";
+                        if (!hay.Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
+                    }
+
+                    items.Add(obj);
                 }
-                catch (IOException)
+                catch
                 {
-                    Thread.Sleep(50);
+                    // ignore malformed line
                 }
             }
 
-            return Ok(new { lines });
+            return Ok(new { items });
+        }
+
+        private static string CanonLevel(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return "";
+            switch (s.Trim().ToUpperInvariant())
+            {
+                case "INF":
+                case "INFO":
+                case "INFORMATION": return "INF";
+                case "WRN":
+                case "WARN":
+                case "WARNING": return "WRN";
+                case "ERR":
+                case "ERROR": return "ERR";
+                case "DBG":
+                case "DEBUG": return "DBG";
+                case "VRB":
+                case "VERBOSE": return "VRB";
+                case "FTL":
+                case "FATAL": return "FTL";
+                default: return s.Trim().ToUpperInvariant();
+            }
         }
     }
 }

@@ -1,12 +1,7 @@
 ﻿using HappyWarehouse.Domain.Entities;
 using HappyWarehouse.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HappyWarehouse.Infrastructure.Repositories
 {
@@ -55,7 +50,7 @@ namespace HappyWarehouse.Infrastructure.Repositories
         public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
         {
             IQueryable<T> query = _set.AsQueryable();
-            if (predicate != null) query  = query.Where(predicate);
+            if (predicate != null) query = query.Where(predicate);
             return await query.CountAsync();
         }
 
@@ -83,7 +78,7 @@ namespace HappyWarehouse.Infrastructure.Repositories
             if (id <= 0)
                 throw new ArgumentOutOfRangeException(nameof(id), "ID must be greater than zero.");
 
-            var entity = await _set.FirstOrDefaultAsync(x=> x.Id == id);
+            var entity = await _set.FirstOrDefaultAsync(x => x.Id == id);
             if (entity is null) return;
             _set.Remove(entity);
             await _db.SaveChangesAsync();
@@ -95,5 +90,15 @@ namespace HappyWarehouse.Infrastructure.Repositories
         }
 
         public IQueryable<T> Query() => _set.AsQueryable();
+
+        public Task<List<TOut>> GetAllLookupsAsync<TOut>(
+        Expression<Func<T, TOut>> selector,
+        bool asNoTracking = true,
+        CancellationToken ct = default)
+        {
+            IQueryable<T> q = _set;
+            if (asNoTracking) q = q.AsNoTracking();
+            return q.Select(selector).ToListAsync(ct);
+        }
     }
 }

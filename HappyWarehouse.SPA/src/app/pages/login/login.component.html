@@ -1,0 +1,17 @@
+<div class="d-flex justify-content-center mt-5">
+  <div class="card-white" style="width:420px">
+    <h3 class="mb-3">Login</h3>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" formControlName="email">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="password" formControlName="password">
+      </div>
+      <button class="btn btn-primary w-100" [disabled]="submitting">Login</button>
+      <div class="text-danger mt-2" *ngIf="error">{{error}}</div>
+    </form>
+  </div>
+</div>
